@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { Text, Image, View, StyleSheet, FlatList, Pressable } from "react-native";
 import Speedometer, {
   Background,
@@ -12,11 +13,67 @@ import ForecastCard from './components/ForecastCard';
 import Geolocation from 'react-native-geolocation-service';
 import * as React from 'react'
 import { PermissionsAndroid } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 
+const Stack = createStackNavigator();
 
-function HomeScreen(){
-  
+
+function HomeScreen(navigation, route){
+  return(
+    <View style={styles.fondo}>
+        {/*Textos superiores*/}
+				<View style={styles.textos}>
+			    <Text style={styles.textosSuperiores}>56º</Text>
+          <Text style={styles.textoRPM}>RPM</Text>
+			  </View>
+
+        {/*Imagenes superiores*/}
+
+		  	<View style={styles.imagenesSuperiores}>
+          <Image source={require('./assets/images/temperatura.png')} style={styles.imagenAceite}/>
+          <Pressable style={styles.botonR} onPress={()=> navigation.navigate('RacingWindow')}>
+            <Text style={styles.textoR}>R</Text>
+          </Pressable>
+				  <Image source={require('./assets/images/revoluciones.png')} style={styles.imagenRev}/>
+        </View>
+        
+        {/*Velocidad*/}
+
+        
+      	<View style={styles.velocimetro}> 
+          
+        	<Speedometer value={Geolocation.getCurrentPosition.speed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
+         	 <Background angle={360}></Background>
+         	 <Arc color='white'></Arc>
+         	 <Needle offset={25}></Needle>
+         	 <DangerPath color='red' arcWidth={10}></DangerPath>
+         	 <Progress/>
+         	 <Marks step={15} lineSize={20} fontSize={15}></Marks>
+        	 <Indicator/>
+       	  </Speedometer>
+        </View>
+       	 <FlatList
+           data={this.state?.forecast?.list && [this.state.forecast.list[0]]}
+           style={{marginTop:15}} 
+           keyExtractor={item => item.dt_txt} 
+           renderItem={({item}) =>
+            <ForecastCard
+             detail={item} 
+             location={this.state.forecast.city.name}
+            />}
+         />
+      </View>
+  )
+}
+
+function RacingWindow(){
+  return(
+    <View>
+      <Text style={{fontSize:50, color: 'red'}}>Texto de prueba</Text>
+    </View>
+  )
 }
 
 //Funcion asincrona para permitir el acceso de ubicacion a la aplicacion
@@ -39,16 +96,6 @@ export async function requestLocationPermission()
     console.warn(err)
   }
 }
-
-
-function RacingWindow(){
-  return(
-    <View>
-      
-    </View>
-  )
-}
-
 
 //Estilos
   const styles = StyleSheet.create({
@@ -119,7 +166,6 @@ function RacingWindow(){
     }
   })
 
-
 export default class App extends React.Component {
 
   
@@ -187,51 +233,12 @@ export default class App extends React.Component {
 render(){
 
   return (
-
-
-      <View style={styles.fondo}>
-        {/*Textos superiores*/}
-				<View style={styles.textos}>
-			    <Text style={styles.textosSuperiores}>56º</Text>
-          <Text style={styles.textoRPM}>RPM</Text>
-			  </View>
-
-        {/*Imagenes superiores*/}
-
-		  	<View style={styles.imagenesSuperiores}>
-          <Image source={require('./assets/images/temperatura.png')} style={styles.imagenAceite}/>
-          <Pressable style={styles.botonR}>
-            <Text style={styles.textoR}>R</Text>
-          </Pressable>
-				  <Image source={require('./assets/images/revoluciones.png')} style={styles.imagenRev}/>
-        </View>
-        
-        {/*Velocidad*/}
-
-        
-      	<View style={styles.velocimetro}> 
-          
-        	<Speedometer value={Geolocation.getCurrentPosition.speed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
-         	 <Background angle={360}></Background>
-         	 <Arc color='white'></Arc>
-         	 <Needle offset={25}></Needle>
-         	 <DangerPath color='red' arcWidth={10}></DangerPath>
-         	 <Progress/>
-         	 <Marks step={15} lineSize={20} fontSize={15}></Marks>
-        	 <Indicator/>
-       	  </Speedometer>
-        </View>
-       	 <FlatList
-           data={this.state?.forecast?.list && [this.state.forecast.list[0]]}
-           style={{marginTop:15}} 
-           keyExtractor={item => item.dt_txt} 
-           renderItem={({item}) =>
-            <ForecastCard
-             detail={item} 
-             location={this.state.forecast.city.name}
-            />}
-         />
-      </View>
+    <NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name='Home' component={HomeScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name='RacingWindow' component={RacingWindow} options={{ headerShown: false }}/>
+    </Stack.Navigator>
+    </NavigationContainer>
     );
 }};
 
