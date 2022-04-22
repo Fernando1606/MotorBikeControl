@@ -5,6 +5,7 @@ import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, Dange
 import Geolocation from 'react-native-geolocation-service';
 import ForecastCard from '../ForecastCard';
 import { PermissionsAndroid } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 
 
 
@@ -48,7 +49,6 @@ export default class App extends React.Component{
     //Cogemos la ubicacion
 		this.getLocation();
 	}
-
   
   //Espera a que se acepten permisos de ubicacion
   async UNSAFE_componentWillMount() {
@@ -75,7 +75,6 @@ export default class App extends React.Component{
      
 	}
   
-
   //Recogida del tiempo
   getWeather(){
     console.log('Latitud: ', this.state.latitude),
@@ -106,7 +105,7 @@ export default class App extends React.Component{
 
 		  	<View style={styles.imagenesSuperiores}>
           <Image source={require('../../assets/images/temperatura.png')} style={styles.imagenAceite}/>
-          <Pressable style={styles.botonR} onPress={()=> navigation.navigate()}>
+          <Pressable style={styles.botonR} onPress={()=> navigation.navigate('Racing')}>
             <Text style={styles.textoR}>R</Text>
           </Pressable>
 				  <Image source={require('../../assets/images/revoluciones.png')} style={styles.imagenRev}/>
