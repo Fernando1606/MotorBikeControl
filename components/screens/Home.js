@@ -5,8 +5,8 @@ import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, Dange
 import Geolocation from 'react-native-geolocation-service';
 import ForecastCard from '../ForecastCard';
 import { PermissionsAndroid } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-
+//import { NavigationContainer } from '@react-navigation/native';
+//import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 
 
 //Funcion asincrona para permitir el acceso de ubicacion a la aplicacion
@@ -138,6 +138,20 @@ export default class App extends React.Component{
              location={this.state.forecast.city.name}
             />}
          />
+
+         {/*Google Maps*/}
+          
+          {/*<MapView
+            provider='PROVIDER_GOOGLE'
+            initialRegion={{
+              latitude: 37.3757174,
+              longitude: -5.9760505,
+              latitudeDelta: 0.003,
+              longitudeDelta: 0.003
+            }}
+            mapType='standard'
+          ></MapView>
+          */}
       </View>
     )}
 }
