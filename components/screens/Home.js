@@ -5,6 +5,7 @@ import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, Dange
 import Geolocation from 'react-native-geolocation-service';
 import ForecastCard from '../ForecastCard';
 import { PermissionsAndroid } from 'react-native';
+import Clock from 'react-live-clock';
 //import { NavigationContainer } from '@react-navigation/native';
 //import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 
@@ -138,6 +139,7 @@ export default class App extends React.Component{
              location={this.state.forecast.city.name}
             />}
          />
+
 
          {/*Google Maps*/}
           
