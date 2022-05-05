@@ -10,23 +10,25 @@
  import { StyleSheet, View, Image } from 'react-native';
  import { Text, Card, Divider } from 'react-native-elements';
  
+
  
  export default class ForecastCard extends Component {
+
+			 
+	componentDidMount(){
+		setInterval(() => (
+			this.setState(
+				{curTime : new Date().toLocaleString().split(' ', 5).pop()}
+			),1000)
+		)
+	}
+
+	state = {curTime: new Date().toLocaleString().split(' ', 5).pop()};
+
  
 	 render() {
-		 let time;
- 
-		 // Create a new date from the passed date time
-		 var date = new Date();
- 
-		 // Hours part from the timestamp
-		 var hours = date.getHours();
-		 
-		 // Minutes part from the timestamp
-		 var minutes =  date.getMinutes();
- 
-		 time = hours + ':' + minutes;
- 
+
+
 		 return (
 			 <View style={{width: 170, height: 220}}>
 			 <Card containerStyle={styles.card}>
@@ -39,7 +41,7 @@
 				 <Divider style={{ backgroundColor: '#00e6dd', marginVertical:10}} />
 				 
 				 <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-				 	 <Text style={styles.notes}>{time}</Text>
+				 	 <Text style={styles.notes}>{this.state.curTime.split('',5)}</Text>
 					 <Text style={styles.notes}>{Math.round( this.props.detail.main.temp * 10) / 10 }&#8451;</Text>
 				 </View>
 			 </Card>
