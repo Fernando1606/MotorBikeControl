@@ -65,6 +65,17 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 75,
       position: 'relative'
+    },
+    footer : {
+      flexDirection: 'row'
+    },
+    mapa: {
+      height: 180,
+      width: 150,
+      justifyContent: 'flex-end',
+      alignItems : 'center',
+      marginTop : 20,
+      marginRight: 5,
     }
   })
   
