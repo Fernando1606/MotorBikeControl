@@ -20,7 +20,7 @@
 			this.setState(
 				{curTime : new Date().toLocaleString().split(' ', 5).pop()}
 			),1000)
-		)
+		);
 	}
 
 	state = {curTime: new Date().toLocaleString().split(' ', 5).pop()};

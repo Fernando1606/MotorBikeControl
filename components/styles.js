@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
       width: 55, 
       height: 75,
       marginTop: 7,
-      marginLeft:50
+      marginLeft:65
     },
   
     velocimetro: {
@@ -49,22 +49,17 @@ const styles = StyleSheet.create({
     },
 
     botonR: {
-      alignItems: 'center',
-      justifyContent: 'center' ,
       backgroundColor: '#00e6dd',
-      borderRadius:3000,
-      width:80,
-      marginLeft: 60,
-      marginTop: 30,
+      borderRadius:20,
+      marginLeft: 65,
       borderColor: '#00e6dd',
-      borderWidth:1
+
     },
 
     textoR: {
       fontFamily: 'Orbitron-Bold',
       color: 'white',
       fontSize: 75,
-      position: 'relative'
     },
     footer : {
       flexDirection: 'row'
@@ -75,7 +70,8 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-end',
       alignItems : 'center',
       marginTop : 20,
-      marginRight: 5,
+      marginRight: 10,
+      borderRadius: 50
     }
   })
   

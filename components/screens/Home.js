@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, FlatList } from 'react-native'
+import { View, Text, Image, Pressable, FlatList, Alert } from 'react-native'
 import React from 'react'
 import {styles} from '../styles'
 import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
@@ -105,7 +105,7 @@ export default class App extends React.Component{
 
 		  	<View style={styles.imagenesSuperiores}>
           <Image source={require('../../assets/images/temperatura.png')} style={styles.imagenAceite}/>
-          <Pressable style={styles.botonR} onPress={()=> navigation.navigate('Racing')}>
+          <Pressable style={styles.botonR} onPress={()=> {Alert.alert('Boton pulsado')}}>
             <Text style={styles.textoR}>R</Text>
           </Pressable>
 				  <Image source={require('../../assets/images/revoluciones.png')} style={styles.imagenRev}/>
