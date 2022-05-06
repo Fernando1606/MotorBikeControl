@@ -7,6 +7,8 @@ import ForecastCard from '../ForecastCard';
 import { PermissionsAndroid } from 'react-native';
 //import { NavigationContainer } from '@react-navigation/native';
 import MapView, { PROVIDER_GOOGLE }  from 'react-native-maps';
+import { useState } from 'react';
+
 
 
 //Funcion asincrona para permitir el acceso de ubicacion a la aplicacion
@@ -32,6 +34,7 @@ export async function requestLocationPermission()
 
 export default class App extends React.Component{
   
+  
   //Constructor de la clase
   constructor(props){
 		super(props);
@@ -43,12 +46,14 @@ export default class App extends React.Component{
 			error:''
 		};
 	}
+  
 
   //Conforme haga el render llamara a getLocation
 	componentDidMount(){
     //Cogemos la ubicacion
 		this.getLocation();
 	}
+
   
   //Espera a que se acepten permisos de ubicacion
   async UNSAFE_componentWillMount() {
@@ -57,28 +62,45 @@ export default class App extends React.Component{
 
   //Recogida de la ubicacion
   getLocation(){
+    setInterval(() => {
       Geolocation.getCurrentPosition(
-          (position) => {
-            this.setState(
-              (prevState) => ({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              }), () => {this.getWeather();});
+        (position) => {
+          this.setState(
+            (prevState) => ({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              speed: position.coords.speed,
+            }), () => {this.getWeather();});
+        },
+        (error) => {
+          // Devuelve codigo de error
+          console.log(error.code, error.message);
+        },
+        {
+          accuracy: {
+            android: 'high',
+            ios: 'best',
           },
-          (error) => {
-            // Devuelve codigo de error
-            console.log(error.code, error.message);
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
-
-     
+          enableHighAccuracy: true,
+          distanceFilter: 0,
+          interval: 5000,
+          fastestInterval: 2000,
+          forceRequestLocation: true,
+          forceLocationManager: true,
+          showLocationDialog: true,
+          useSignificantChanges: true,
+        },
+    );
+    }, 20)
+      
 	}
+
   
   //Recogida del tiempo
   getWeather(){
     console.log('Latitud: ', this.state.latitude),
     console.log('Longitud: ', this.state.longitude)
+    console.log('Velocidad: ', this.state.speed)
   
     // Obtenemos el tiempo mediante la Api de ApiWeather
     let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + this.state.latitude + '&lon=' + this.state.longitude + '&units=metric&appid=4f38696c56e9bed6c25fc2e13371612e';
@@ -93,7 +115,10 @@ export default class App extends React.Component{
   }
 
   render() {
+
+
     return(
+      
     <View style={styles.fondo}>
         {/*Textos superiores*/}
 				<View style={styles.textos}>
@@ -116,7 +141,7 @@ export default class App extends React.Component{
         
       	<View style={styles.velocimetro}> 
           
-        	<Speedometer value={Geolocation.getCurrentPosition.speed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
+        	<Speedometer value={this.state.speed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
          	 <Background angle={360}></Background>
          	 <Arc color='white'></Arc>
          	 <Needle offset={25}></Needle>
@@ -147,8 +172,8 @@ export default class App extends React.Component{
             provider={PROVIDER_GOOGLE}
             style= {styles.mapa}
             initialRegion={{
-              latitude: 37.3757174,
-              longitude: -5.9760505,
+              latitude: this.state.latitude,
+              longitude: this.state.longitude,
               latitudeDelta: 0.003,
               longitudeDelta: 0.003
             }}
