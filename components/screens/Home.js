@@ -1,124 +1,74 @@
-import { View, Text, Image, Pressable, FlatList, Alert } from 'react-native'
-import React from 'react'
-import {styles} from '../styles'
-import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
-import Geolocation from 'react-native-geolocation-service';
+import {styles} from '../styles';
 import ForecastCard from '../ForecastCard';
-import { PermissionsAndroid } from 'react-native';
+import { View, Text, Image, Pressable, FlatList, Alert, LogBox } from 'react-native';
+import React from 'react';
+import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
 //import { NavigationContainer } from '@react-navigation/native';
 import MapView, { PROVIDER_GOOGLE }  from 'react-native-maps';
-import { useState } from 'react';
+import RNLocation from "react-native-location";
+import {useState} from 'react';
 
 
-
-//Funcion asincrona para permitir el acceso de ubicacion a la aplicacion
-export async function requestLocationPermission() 
-{
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        'title': 'Localizacion',
-        'message': 'Preguntamos por permiso '
-      }
-    )
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("Tenemos acceso a la ubicacion")
-    } else {
-      console.log("No tenemos acceso a la ubicacion")
+  
+const getLocation = async () => {
+  [viewLocation, isViewLocation] = useState([])
+  
+  let permission = await RNLocation.checkPermission({
+    ios: 'whenInUse', // or 'always'
+    android: {
+      detail: 'coarse' // or 'fine'
     }
-  } catch (err) {
-    console.warn(err)
-  }
-}
+  });
 
-export default class App extends React.Component{
-  
-  
-  //Constructor de la clase
-  constructor(props){
-		super(props);
-		
-		this.state = {
-			latitude: 0,
-			longitude: 0,
-			forecast: [],
-			error:''
-		};
-	}
-  
+  console.log(permission)
 
-  //Conforme haga el render llamara a getLocation
-	componentDidMount(){
-    //Cogemos la ubicacion
-		this.getLocation();
-	}
-
-  
-  //Espera a que se acepten permisos de ubicacion
-  async UNSAFE_componentWillMount() {
-    await requestLocationPermission()
-}
-
-  //Recogida de la ubicacion
-  getLocation(){
-    setInterval(() => {
-      Geolocation.getCurrentPosition(
-        (position) => {
-          this.setState(
-            (prevState) => ({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              speed: position.coords.speed,
-            }), () => {this.getWeather();});
-        },
-        (error) => {
-          // Devuelve codigo de error
-          console.log(error.code, error.message);
-        },
-        {
-          accuracy: {
-            android: 'high',
-            ios: 'best',
-          },
-          enableHighAccuracy: true,
-          distanceFilter: 0,
-          interval: 5000,
-          fastestInterval: 2000,
-          forceRequestLocation: true,
-          forceLocationManager: true,
-          showLocationDialog: true,
-          useSignificantChanges: true,
-        },
-    );
-    }, 20)
-      
-	}
-
-  
-  //Recogida del tiempo
-  getWeather(){
-    console.log('Latitud: ', this.state.latitude),
-    console.log('Longitud: ', this.state.longitude)
-    console.log('Velocidad: ', this.state.speed)
-  
-    // Obtenemos el tiempo mediante la Api de ApiWeather
-    let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + this.state.latitude + '&lon=' + this.state.longitude + '&units=metric&appid=4f38696c56e9bed6c25fc2e13371612e';
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      this.setState((prevState, props) => ({
-        forecast: data
-      }));
-      
+  let location;
+  if(!permission) {
+    permission = await RNLocation.requestPermission({
+      ios: "whenInUse",
+      android: {
+        detail: "coarse",
+        rationale: {
+          title: "We need to access your location",
+          message: "We use your location to show where you are on the map",
+          buttonPositive: "OK",
+          buttonNegative: "Cancel"
+        }
+      }
     })
+    console.log(permission)
+    location = await RNLocation.getLatestLocation({timeout: 100})
+    console.log(location)
+    isViewLocation(location)
+    
+  } else {
+    location = await RNLocation.getLatestLocation({timeout: 100})
+    console.log(location)
+    isViewLocation(location)
   }
+}
 
-  render() {
+const getWeather = () => {
+  console.log('Latitud: ', viewLocation.latitude),
+  console.log('Longitud: ', viewLocation.longitude)
+  // Obtenemos el tiempo mediante la Api de ApiWeather
+  let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + viewLocation.latitude + '&lon=' + viewLocation.longitude + '&units=metric&appid=4f38696c56e9bed6c25fc2e13371612e';
+  fetch(url)
+  .then(response => response.json())
+  .then(data => {
+    this.setState((prevState, props) => ({
+      forecast: data
+    }));
+    
+  })
+}
+  const App = () => {   
+
+    getLocation()
+    getWeather()
 
 
-    return(
-      
+    return( 
     <View style={styles.fondo}>
         {/*Textos superiores*/}
 				<View style={styles.textos}>
@@ -141,7 +91,7 @@ export default class App extends React.Component{
         
       	<View style={styles.velocimetro}> 
           
-        	<Speedometer value={this.state.speed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
+        	<Speedometer value={viewLocation.speed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
          	 <Background angle={360}></Background>
          	 <Arc color='white'></Arc>
          	 <Needle offset={25}></Needle>
@@ -172,8 +122,8 @@ export default class App extends React.Component{
             provider={PROVIDER_GOOGLE}
             style= {styles.mapa}
             initialRegion={{
-              latitude: this.state.latitude,
-              longitude: this.state.longitude,
+              latitude: 37.3826,
+              longitude: -5.99629,
               latitudeDelta: 0.003,
               longitudeDelta: 0.003
             }}
@@ -181,4 +131,5 @@ export default class App extends React.Component{
         </View>
       </View>
     )}
-}
+
+export default  App;
