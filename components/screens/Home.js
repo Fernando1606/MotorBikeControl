@@ -1,72 +1,80 @@
 import {styles} from '../styles';
 import ForecastCard from '../ForecastCard';
-import { View, Text, Image, Pressable, FlatList, Alert, LogBox } from 'react-native';
+import { View, Text, Image, Pressable, FlatList, Alert,  } from 'react-native';
 import React from 'react';
 import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
 //import { NavigationContainer } from '@react-navigation/native';
 import MapView, { PROVIDER_GOOGLE }  from 'react-native-maps';
 import RNLocation from "react-native-location";
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
+
+
+
 
 
   
-const getLocation = async () => {
-  [viewLocation, isViewLocation] = useState([])
-  
-  let permission = await RNLocation.checkPermission({
-    ios: 'whenInUse', // or 'always'
-    android: {
-      detail: 'coarse' // or 'fine'
-    }
-  });
 
-  console.log(permission)
-
-  let location;
-  if(!permission) {
-    permission = await RNLocation.requestPermission({
-      ios: "whenInUse",
-      android: {
-        detail: "coarse",
-        rationale: {
-          title: "We need to access your location",
-          message: "We use your location to show where you are on the map",
-          buttonPositive: "OK",
-          buttonNegative: "Cancel"
-        }
-      }
-    })
-    console.log(permission)
-    location = await RNLocation.getLatestLocation({timeout: 100})
-    console.log(location)
-    isViewLocation(location)
-    
-  } else {
-    location = await RNLocation.getLatestLocation({timeout: 100})
-    console.log(location)
-    isViewLocation(location)
-  }
-}
-
-const getWeather = () => {
-  console.log('Latitud: ', viewLocation.latitude),
-  console.log('Longitud: ', viewLocation.longitude)
-  // Obtenemos el tiempo mediante la Api de ApiWeather
-  let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + viewLocation.latitude + '&lon=' + viewLocation.longitude + '&units=metric&appid=4f38696c56e9bed6c25fc2e13371612e';
-  fetch(url)
-  .then(response => response.json())
-  .then(data => {
-    this.setState((prevState, props) => ({
-      forecast: data
-    }));
-    
-  })
-}
   const App = () => {   
+    const [viewLocation, setViewLocation] = useState([]);
 
-    getLocation()
-    getWeather()
+    const getLocation = async() => {
+  
+      let permission =  RNLocation.checkPermission({
+        ios: 'whenInUse', // or 'always'
+        android: {
+          detail: 'fine' // or 'fine'
+        }
+      });
+    
+      let location;
+      if(!permission) {
+        permission =  await RNLocation.requestPermission({
+          ios: "whenInUse",
+          android: {
+            detail: "coarse",
+            rationale: {
+              title: "We need to access your location",
+              message: "We use your location to show where you are on the map",
+              buttonPositive: "OK",
+              buttonNegative: "Cancel"
+            }
+          }
+        })
+        location =  await RNLocation.getLatestLocation({timeout: 100})
+        setViewLocation(location)
+        
+      } else {
+        location = await RNLocation.getLatestLocation({timeout: 100})
+        console.log('Location:', location)
+        setViewLocation(location)
+      }
+       console.log('Estoy en location')
+    }
+    
+     const getWeather = () => {
+      console.log('Estoy en weather')
+      // Obtenemos el tiempo mediante la Api de ApiWeather
+      let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + viewLocation.latitude + '&lon=' + viewLocation.longitude + '&units=metric&appid=4f38696c56e9bed6c25fc2e13371612e';
+      fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        this.setState((prevState, props) => ({
+          forecast: data
+        }));
+        
+      })
 
+    }
+
+
+    useEffect(() => {
+      getLocation()
+      getWeather()
+    }, [])
+    
+
+    console.log('Latitud: ', viewLocation.latitude),
+    console.log('Longitud: ', viewLocation.longitude)
 
     return( 
     <View style={styles.fondo}>
@@ -106,7 +114,7 @@ const getWeather = () => {
         <View style={styles.footer}>
         {/*Lista para mostrar el tiempo*/}
        	 <FlatList
-           data={this.state?.forecast?.list && [this.state.forecast.list[0]]}
+           data={useState?.forecast?.list && [useState.forecast.list[0]]}
            keyExtractor={item => item.dt_txt} 
            renderItem={({item}) =>
             <ForecastCard
@@ -122,10 +130,10 @@ const getWeather = () => {
             provider={PROVIDER_GOOGLE}
             style= {styles.mapa}
             initialRegion={{
-              latitude: 37.3826,
-              longitude: -5.99629,
-              latitudeDelta: 0.003,
-              longitudeDelta: 0.003
+              latitude: (viewLocation.latitude),
+              longitude: (viewLocation.longitude),
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01
             }}
           ></MapView>
         </View>

@@ -52,8 +52,8 @@ const styles = StyleSheet.create({
       backgroundColor: '#00e6dd',
       borderRadius:20,
       marginLeft: 65,
-      borderColor: '#00e6dd',
-
+      borderColor: 'red',
+      borderStyle: 'solid'
     },
 
     textoR: {
