@@ -11,11 +11,13 @@ import {useState, useEffect} from 'react';
 
 
 
-
-  
-
   const App = () => {   
     const [viewLocation, setViewLocation] = useState([]);
+
+    useEffect(() => {
+      getLocation()
+      getWeather()
+    }, [])
 
     const getLocation = async() => {
   
@@ -48,13 +50,11 @@ import {useState, useEffect} from 'react';
         console.log('Location:', location)
         setViewLocation(location)
       }
-       console.log('Estoy en location')
     }
     
      const getWeather = () => {
-      console.log('Estoy en weather')
       // Obtenemos el tiempo mediante la Api de ApiWeather
-      let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + viewLocation.latitude + '&lon=' + viewLocation.longitude + '&units=metric&appid=4f38696c56e9bed6c25fc2e13371612e';
+      let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + viewLocation.latitude + '&lon=' + viewLocation.longitude + '&units=metric&appid=37dcdd0526050776128ced549039b1c5e';
       fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -65,18 +65,22 @@ import {useState, useEffect} from 'react';
       })
 
     }
-
-
-    useEffect(() => {
-      getLocation()
-      getWeather()
-    }, [])
     
 
     console.log('Latitud: ', viewLocation.latitude),
     console.log('Longitud: ', viewLocation.longitude)
 
+
+    const obtenerVelocidadInstantanea = () => {
+      let velocidad =0;
+      velocidad = setInterval(() => {
+        viewLocation.speed;
+      },5)
+    }   
+
     return( 
+
+      setTimeout(()=>{},5000),
     <View style={styles.fondo}>
         {/*Textos superiores*/}
 				<View style={styles.textos}>
@@ -96,10 +100,9 @@ import {useState, useEffect} from 'react';
         
         {/*Velocidad*/}
 
-        
       	<View style={styles.velocimetro}> 
           
-        	<Speedometer value={viewLocation.speed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
+        	<Speedometer value={obtenerVelocidadInstantanea()} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
          	 <Background angle={360}></Background>
          	 <Arc color='white'></Arc>
          	 <Needle offset={25}></Needle>
@@ -126,16 +129,17 @@ import {useState, useEffect} from 'react';
 
          {/*Google Maps*/}
           
-          <MapView
+         {/*<MapView
             provider={PROVIDER_GOOGLE}
             style= {styles.mapa}
             initialRegion={{
               latitude: (viewLocation.latitude),
               longitude: (viewLocation.longitude),
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01
+              latitudeDelta: Number(54),
+              longitudeDelta: Number(46)
             }}
-          ></MapView>
+            mapType = 'terrain'
+          ></MapView>*/}
         </View>
       </View>
     )}

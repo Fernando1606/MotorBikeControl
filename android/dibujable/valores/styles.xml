@@ -1,0 +1,4 @@
+<style name="BootTheme" parent="AppTheme">
+    <item name="android:background">@drawable/bootsplash</item>
+</style>
+

@@ -50,9 +50,9 @@ const styles = StyleSheet.create({
 
     botonR: {
       backgroundColor: '#00e6dd',
-      borderRadius:20,
+      borderRadius:80,
       marginLeft: 65,
-      borderColor: 'red',
+      borderColor: '#FF0000',
       borderStyle: 'solid'
     },
 
