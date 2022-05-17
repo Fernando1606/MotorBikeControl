@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
       borderRadius:80,
       marginLeft: 65,
       borderColor: '#FF0000',
-      borderStyle: 'solid'
     },
 
     textoR: {
@@ -72,7 +71,8 @@ const styles = StyleSheet.create({
       marginTop : 20,
       marginRight: 10,
       borderRadius: 50
-    }
+    },
+
   })
   
   export {styles}

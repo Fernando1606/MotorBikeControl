@@ -23,6 +23,10 @@ target 'MotorBikeControlApp' do
 
   pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
 
+  pod 'rn-splash-screen', :path => '../node_modules/rn-splash-screen'
+
+  pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+
   target 'MotorBikeControlAppTests' do
     inherit! :complete
     # Pods for testing

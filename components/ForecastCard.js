@@ -18,12 +18,12 @@
 	componentDidMount(){
 		setInterval(() => (
 			this.setState(
-				{curTime : new Date().toLocaleString().split(' ', 5).pop()}
+				{curTime : new Date().toLocaleString().split(' ', 4).pop()}
 			),1000)
 		);
 	}
 
-	state = {curTime: new Date().toLocaleString().split(' ', 5).pop()};
+	state = {curTime: new Date().toLocaleString().split(' ', 4).pop()};
 
  
 	 render() {
