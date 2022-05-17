@@ -6,7 +6,7 @@ export default function Loading({navigation}) {
 
     setTimeout(() => {
         navigation.navigate('Home')
-    }, 5000);
+    }, 3500);
 
   return (
     <View style={styles.cargaDatos}>
