@@ -1,13 +1,12 @@
 import {styles} from '../styles';
 import ForecastCard from '../ForecastCard';
-import { View, Text, Image, Pressable, FlatList, Alert} from 'react-native';
+import { View, Text, Image, Pressable, FlatList, TouchableOpacity} from 'react-native';
 import React from 'react';
 import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
 //import { NavigationContainer } from '@react-navigation/native';
 import MapView, {Marker, PROVIDER_GOOGLE}  from 'react-native-maps';
 import RNLocation from "react-native-location";
 import {useState, useEffect} from 'react';
-
 
 
 
@@ -40,7 +39,7 @@ import {useState, useEffect} from 'react';
         setOrigin(currentLocation)
 
     }
-    
+
      const getWeather = () => {
 
       // Obtenemos el tiempo mediante la Api de ApiWeather
@@ -52,9 +51,10 @@ import {useState, useEffect} from 'react';
       })
     }
 
-
-    const getSpeed = origin.speed;
-
+    let getSpeed;
+    setInterval(()=>{
+      getSpeed = origin.speed;
+    })
     
     return( 
 
@@ -71,9 +71,7 @@ import {useState, useEffect} from 'react';
 
 		  	<View style={styles.imagenesSuperiores}>
           <Image source={require('../../assets/images/temperatura.png')} style={styles.imagenAceite}/>
-          <Pressable style={styles.botonR} onPress={()=> navigation.navigate('Racing')}>
-            <Text style={styles.textoR}>R</Text>
-          </Pressable>
+          <Text style={styles.textoR}>R</Text>
 				  <Image source={require('../../assets/images/revoluciones.png')} style={styles.imagenRev}/>
         </View>
         
@@ -81,7 +79,7 @@ import {useState, useEffect} from 'react';
 
       	<View style={styles.velocimetro}> 
           
-        	<Speedometer value={5} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
+        	<Speedometer value={getSpeed} fontFamily='Orbitron-Bold' max={300} width= {300} accentColor='#00e6dd'>
          	 <Background angle={360}></Background>
          	 <Arc color='white'></Arc>
          	 <Needle offset={25}></Needle>

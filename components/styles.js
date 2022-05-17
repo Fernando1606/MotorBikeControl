@@ -48,17 +48,11 @@ const styles = StyleSheet.create({
       marginTop: 25
     },
 
-    botonR: {
-      backgroundColor: '#00e6dd',
-      borderRadius:80,
-      marginLeft: 65,
-      borderColor: '#FF0000',
-    },
-
     textoR: {
       fontFamily: 'Orbitron-Bold',
       color: 'white',
       fontSize: 75,
+      marginLeft: 65
     },
     footer : {
       flexDirection: 'row'
@@ -93,11 +87,6 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 120,
       paddingBottom: 100
-    },
-
-    textoCargaFooter: {
-      color: 'white',
-      paddingTop: 50
     }
 
   })

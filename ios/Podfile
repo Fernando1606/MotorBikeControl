@@ -27,6 +27,8 @@ target 'MotorBikeControlApp' do
 
   pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
 
+  pod 'react-native-orientation', :path => '../node_modules/react-native-orientation'
+
   target 'MotorBikeControlAppTests' do
     inherit! :complete
     # Pods for testing
