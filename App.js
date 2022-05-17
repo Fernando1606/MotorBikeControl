@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './components/screens/Home';
 import Racing from './components/screens/Racing';
+import Loading from './components/screens/Loading';
 import { LogBox } from 'react-native';
 
 LogBox.ignoreAllLogs();
@@ -15,6 +16,7 @@ export default function App(){
   return (
     <NavigationContainer>
     <Stack.Navigator>
+      <Stack.Screen name='Loading' component={Loading} options={{headerShown: false}}/>
       <Stack.Screen name='Home' component={Home} options={{ headerShown: false }}/>
       <Stack.Screen name='Racing' component={Racing} options={{ headerShown: false }}/>
 

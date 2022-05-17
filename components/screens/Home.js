@@ -1,6 +1,6 @@
 import {styles} from '../styles';
 import ForecastCard from '../ForecastCard';
-import { View, Text, Image, Pressable, FlatList, Alert, ActivityIndicator  } from 'react-native';
+import { View, Text, Image, Pressable, FlatList, Alert} from 'react-native';
 import React from 'react';
 import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
 //import { NavigationContainer } from '@react-navigation/native';
@@ -12,7 +12,7 @@ import {useState, useEffect} from 'react';
 
 
 
-  const App = () => {   
+  const App = ({navigation}) => {   
 
     const [weather, setWeather] = useState(null);
     const [origin, setOrigin] = useState({
@@ -61,7 +61,6 @@ import {useState, useEffect} from 'react';
       console.log('Velocidad --->', getSpeed),
 
     <View style={styles.fondo}>
-      <ActivityIndicator/>
         {/*Textos superiores*/}
 				<View style={styles.textos}>
 			    <Text style={styles.textosSuperiores}>56º</Text>
@@ -72,7 +71,7 @@ import {useState, useEffect} from 'react';
 
 		  	<View style={styles.imagenesSuperiores}>
           <Image source={require('../../assets/images/temperatura.png')} style={styles.imagenAceite}/>
-          <Pressable style={styles.botonR} onPress={()=> {Alert.alert('Boton pulsado')}}>
+          <Pressable style={styles.botonR} onPress={()=> navigation.navigate('Racing')}>
             <Text style={styles.textoR}>R</Text>
           </Pressable>
 				  <Image source={require('../../assets/images/revoluciones.png')} style={styles.imagenRev}/>

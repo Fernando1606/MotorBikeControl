@@ -73,6 +73,33 @@ const styles = StyleSheet.create({
       borderRadius: 50
     },
 
+    cargaDatos: {
+      flex:1,
+      justifyContent: 'center',
+      backgroundColor: '#00e6dd'
+    },
+
+    textoCarga: {
+      fontFamily: 'Orbitron-Bold',
+      color: 'white',
+      fontSize: 25,
+      textAlign: 'center',
+      paddingTop: 60
+    },
+
+    textoLogo: {
+      fontFamily: 'Orbitron-Bold',
+      textAlign: 'center',
+      color: 'white',
+      fontSize: 120,
+      paddingBottom: 100
+    },
+
+    textoCargaFooter: {
+      color: 'white',
+      paddingTop: 50
+    }
+
   })
   
   export {styles}
