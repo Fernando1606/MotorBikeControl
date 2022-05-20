@@ -7,43 +7,52 @@ import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, Dange
 import MapView, {Marker, PROVIDER_GOOGLE}  from 'react-native-maps';
 import RNLocation from "react-native-location";
 import {useState, useEffect} from 'react';
-
-
-
+import { PermissionsAndroid } from 'react-native';
 
   const App = ({navigation}) => {   
 
     const [weather, setWeather] = useState(null);
-    const [origin, setOrigin] = useState({
+    const [origin] = useState({
       latitude: 37.3826,
       longitude: -5.99629,
       speed: 0
     })
 
+    const [ubication,setUbication] = useState({
+      latitude: origin.latitude,
+      longitude: origin.longitude
+    })
+   
+
     useEffect(() => {
+      PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
 
       getLocation()
       getWeather()
+      mostrado()
       
-
     }, [])
 
 
-    const getLocation = async() => {
+    var getLocation = async() => {
 
-      let location = await RNLocation.getLatestLocation({timeout: 100});
-      const currentLocation ={
+      var location = await RNLocation.getLatestLocation({timeout: 100});
+      var currentLocation ={
         latitude: location.latitude,
-        longitude: location.longitude
+        longitude: location.longitude,
+        speed: location.speed
       }
-        setOrigin(currentLocation)
 
+      console.log('CurrentLocation: --> ', currentLocation)
+      return currentLocation;
     }
+
+
 
      const getWeather = () => {
 
       // Obtenemos el tiempo mediante la Api de ApiWeather
-      let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + origin.latitude + '&lon=' + origin.longitude + '&units=metric&appid=37dcdd0526050776128ced549039b1c5';
+      let url = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + ubication.latitude + '&lon=' + ubication.longitude + '&units=metric&appid=37dcdd0526050776128ced549039b1c5';
       fetch(url)
       .then(response => response.json())
       .then((responseJson)=>{
@@ -51,15 +60,38 @@ import {useState, useEffect} from 'react';
       })
     }
 
-    let getSpeed;
+    const onRegionChange = () => {
+      setInterval(()=> {
+        return setUbication(getLocation)
+      },10000)
+    }
+
+    var getSpeed;
     setInterval(()=>{
       getSpeed = origin.speed;
     })
     
+
+    const mostrado = () => {
+    setInterval(()=> {
+      console.log(ubication)
+    },1000)
+  }
+
+  const compruebaNull = () => {
+    onRegionChange()
+    if(ubication.latitude===null||ubication.longitude===null||ubication.speed===null){
+      return origin
+    } else return onRegionChange()
+  }
+
+  const dataWeather = () => {
+    return weather?.list&&[weather?.list[0]]
+  }
+  
+    
     return( 
-
-      console.log('Velocidad --->', getSpeed),
-
+      console.log('Lo que llega', origin),
     <View style={styles.fondo}>
         {/*Textos superiores*/}
 				<View style={styles.textos}>
@@ -94,7 +126,7 @@ import {useState, useEffect} from 'react';
         <View style={styles.footer}>
         {/*Lista para mostrar el tiempo*/}
        	 <FlatList
-           data={weather?.list}
+           data={dataWeather()}
            keyExtractor={item => item.dt_txt} 
            renderItem={({item}) =>
             <ForecastCard
@@ -112,9 +144,11 @@ import {useState, useEffect} from 'react';
             initialRegion={{
               latitude: origin.latitude,
               longitude: origin.longitude,
-              latitudeDelta: 0.09,
-              longitudeDelta: 0.04
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.0025
             }}
+
+            onRegionChange={compruebaNull()}
           >
             <Marker
               draggable
