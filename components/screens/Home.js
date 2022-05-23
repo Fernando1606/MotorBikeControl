@@ -8,6 +8,15 @@ import MapView, {Marker, PROVIDER_GOOGLE}  from 'react-native-maps';
 import RNLocation from "react-native-location";
 import {useState, useEffect} from 'react';
 import { PermissionsAndroid } from 'react-native';
+import { BleManager } from 'react-native-ble-plx';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['new NativeEventEmitter']);
+LogBox.ignoreLogs(['Possible Unhandled Promise Rejection'])
+LogBox.ignoreLogs(['ColorPropType']);
+LogBox.ignoreLogs(['ViewPropTypes'])
+
+LogBox.ignoreAllLogs();
 
   const App = ({navigation}) => {   
 
@@ -18,6 +27,7 @@ import { PermissionsAndroid } from 'react-native';
       speed: 0
     })
 
+
     const [ubication,setUbication] = useState({
       latitude: origin.latitude,
       longitude: origin.longitude
@@ -25,12 +35,11 @@ import { PermissionsAndroid } from 'react-native';
    
 
     useEffect(() => {
-      PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
-
       getLocation()
       getWeather()
       mostrado()
-      
+      scan()
+      connect()
     }, [])
 
 
@@ -43,7 +52,6 @@ import { PermissionsAndroid } from 'react-native';
         speed: location.speed
       }
 
-      console.log('CurrentLocation: --> ', currentLocation)
       return currentLocation;
     }
 
@@ -74,7 +82,6 @@ import { PermissionsAndroid } from 'react-native';
 
     const mostrado = () => {
     setInterval(()=> {
-      console.log(ubication)
     },1000)
   }
 
@@ -88,10 +95,69 @@ import { PermissionsAndroid } from 'react-native';
   const dataWeather = () => {
     return weather?.list&&[weather?.list[0]]
   }
+
+
+
+
+
+
+  //Conexion bluetooth
+
+
+
+  const manager = new BleManager();
+  const [device, setDevice] = useState(null);
+
+
+  const scan = () =>{
+    console.log('Scan')
+    manager.startDeviceScan(null, {
+      allowDuplicates: false
+    },
+      async (error, device) => {
+        console.log('......Escaneando......');
+        if (error) {
+          manager.stopDeviceScan();
+        }
+
+        console.log(device)
+        if (device){
+          setDevice(device);
+          manager.stopDeviceScan()
+        }else{
+          console.log('Dispositivo no disponible')
+        }
+      }
+    )
+  }
+
+  const connect = () => {
+    manager.stopDeviceScan();
+
+    if (device!=null){
+      device.connect()
+      .then((deviceData) =>{
+        manager.onDeviceDisconnected(
+          deviceData.id,
+          (connectionError, connectionData) =>{
+            if (connectionError){
+              console.log(connectionError)
+            }
+  
+            console.log('Dispositivo desconectado')
+            console.log(connectionData)
+          }
+        )
+      }).then(
+        manager.connectToDevice(device.id)
+      )
+    }
+  }
+
+
   
     
     return( 
-      console.log('Lo que llega', origin),
     <View style={styles.fondo}>
         {/*Textos superiores*/}
 				<View style={styles.textos}>
