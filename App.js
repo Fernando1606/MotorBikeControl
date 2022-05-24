@@ -4,9 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './components/screens/Home';
 import Loading from './components/screens/Loading';
-import { LogBox } from 'react-native';
 
-LogBox.ignoreAllLogs();
 
 const Stack = createStackNavigator();
 

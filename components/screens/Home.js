@@ -1,9 +1,8 @@
 import {styles} from '../styles';
 import ForecastCard from '../ForecastCard';
-import { View, Text, Image, FlatList, DeviceEventEmitter} from 'react-native';
+import { View, Text, Image, FlatList, DeviceEventEmitter, PermissionsAndroid} from 'react-native';
 import React from 'react';
 import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
-//import { NavigationContainer } from '@react-navigation/native';
 import MapView, {Marker, PROVIDER_GOOGLE}  from 'react-native-maps';
 import RNLocation from "react-native-location";
 import {useState, useEffect} from 'react';
@@ -20,6 +19,52 @@ LogBox.ignoreAllLogs();
 
   const App = ({navigation}) => {   
 
+
+    //Permisos
+
+    const requestUbicationPermission = async () => {
+      try{
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Permisos de Ubicación',
+            message: 'Necesitamos acceder a tu ubicación',
+            buttonPositive: 'Ok',
+            buttonNegative: 'Cancelar'
+          }
+        );
+        if (granted===PermissionsAndroid.RESULTS.GRANTED){
+          console.log('Tenemos permisos de ubicacion')
+        }
+      } catch (err){
+         console.warn(err)
+      }
+    }
+
+    const requestBluetoothPermission = async () => {
+      try{
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+
+          {
+            title: 'Permisos de Bluetooth',
+            message: 'Necesitamos acceder a tu bluetooth',
+            buttonPositive: 'Ok',
+            buttonNegative: 'Cancelar'
+          }
+        );
+        if (granted===PermissionsAndroid.RESULTS.GRANTED){
+          console.log('Tenemos permisos de bluetooth')
+        }else{
+          console.log('Puta mierda')
+        }
+      } catch (err){
+         console.warn(err)
+      }
+    }
+
+
+
     const [weather, setWeather] = useState(null);
     const [origin] = useState({
       latitude: 37.3826,
@@ -35,13 +80,12 @@ LogBox.ignoreAllLogs();
    
 
     useEffect(() => {
+      requestUbicationPermission()
+      requestBluetoothPermission()
       getLocation()
       getWeather()
       mostrado()
-      scan()
-      connect()
-      obdLiveDataListener = DeviceEventEmitter.addListener('obd2LiveData')
-      ELM()
+      onScanDevices()
     }, [])
 
 
@@ -85,22 +129,21 @@ LogBox.ignoreAllLogs();
     const mostrado = () => {
     setInterval(()=> {
     },1000)
-  }
+    }
 
-  const compruebaNull = () => {
+    const compruebaNull = () => {
     onRegionChange()
     if(ubication.latitude===null||ubication.longitude===null||ubication.speed===null){
       return origin
     } else return onRegionChange()
-  }
+    }
 
-  const dataWeather = () => {
-    return weather?.list&&[weather?.list[0]]
-  }
-
-
+    const dataWeather = () => {
+      return weather?.list&&[weather?.list[0]]
+    }
 
 
+    
 
 
   //Conexion bluetooth
@@ -111,119 +154,38 @@ LogBox.ignoreAllLogs();
   const [device, setDevice] = useState(null);
 
 
-  const scan = () =>{
-    console.log('Scan')
-    manager.startDeviceScan(null, {
-      allowDuplicates: false
-    },
-      async (error, device) => {
-        console.log('......Escaneando......');
-        if (error) {
-          manager.stopDeviceScan();
-        }
-
-        console.log(device)
-        if (device){
-          setDevice(device);
-          manager.stopDeviceScan()
-        }else{
-          console.log('Dispositivo no disponible')
-        }
-      }
-    )
-  }
-
-  const connect = () => {
-    manager.stopDeviceScan();
-
-    if (device!=null){
-      device.connect()
-      .then((deviceData) =>{
-        manager.onDeviceDisconnected(
-          deviceData.id,
-          (connectionError, connectionData) =>{
-            if (connectionError){
-              console.log(connectionError)
-            }
-  
-            console.log('Dispositivo desconectado')
-            console.log(connectionData)
-          }
-        )
-      }).then(
-        manager.connectToDevice(device.id)
-      )
+  const onScanDevices = async() => {
+    const btState = await manager.state();
+    if (btState!=='PoweredOn'){
+      console.log('Fallo')
+      return false;
     }
-  }
 
+    manager.startDeviceScan(null,null, async (error,device) =>{
+      if (error){
+        console.log('Error --> ', error)
+        return;
+      }
 
+      if (device){
+        setDevice(device)
+        console.log('Dispositivo --> ', device.id)
 
-
-
-
-  //OBD2
-
-  const ELM = () => {
-
-
-    const [dataCar, setDataCar] = useState({
-        tempOBD: '-',
-        velocidadOBD: '0km/h',
-        rpmOBD: '0RPM',
-        obd2Data: []
+      }
     })
-   
+    manager.stopDeviceScan()
 
-    console.log('Aqui llego')
-
-
-    const nameList = obd2.getBluetoothDeviceNameList();
-    const deviceObd2 = namelist.filter(item => item.name ==='OBDII');
-    obd2.ready();
-    if (deviceObd2.length > 0){
-      obd2.startLiveData(deviceObd2[0].address)
-    }
-    
-    const startLiveData = () =>{
-      obd2.setMockUpMode(true);
-      obd2.startLiveData('10 F0 8B 3F 91 DEL ELM CUANDO SE CONECTE')
-    }
-
-
-    const obd2LiveData = (data) => {
-      let copyData = JSON.parse(JSON.stringify(setDataCar.obd2Data))
-      copyData[data.cmdID] = data;
-      setDataCar(copyData)
-
-
-      if (data.cmdID  === 'ENGINE_RPM'){
-        setDataCar.rpmOBD = data.cmdResult
-      }
-
-      if (data.cmdID  === 'SPEED'){
-        setDataCar.velocidadOBD = data.cmdResult
-      }
-
-      if (data.cmdID  === 'AIR_INTAKE_TEMP'){
-        setDataCar.tempOBD = data.cmdResult
-      }
-
-    }
-
-    useEffect(() =>{
-      nameList()
-      deviceObd2()
-      startLiveData()
-      obd2LiveData()
-    })
-  
-    return dataCar
-
+    return true;
   }
 
+  
+
+
+ 
 
     
     return( 
+
     <View style={styles.fondo}>
         {/*Textos superiores*/}
 				<View style={styles.textos}>
