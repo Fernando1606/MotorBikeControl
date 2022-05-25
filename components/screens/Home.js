@@ -1,7 +1,7 @@
 import {styles} from '../styles';
 import ForecastCard from '../ForecastCard';
 import { View, Text, Image, FlatList, DeviceEventEmitter, PermissionsAndroid} from 'react-native';
-import React from 'react';
+import React, { useRef } from 'react';
 import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
 import MapView, {Marker, PROVIDER_GOOGLE}  from 'react-native-maps';
 import RNLocation from "react-native-location";
@@ -11,9 +11,9 @@ import { LogBox } from 'react-native';
 import obd2, { startLiveData } from '@furkanom/react-native-obd2';
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
-LogBox.ignoreLogs(['Possible Unhandled Promise Rejection'])
+LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 LogBox.ignoreLogs(['ColorPropType']);
-LogBox.ignoreLogs(['ViewPropTypes'])
+LogBox.ignoreLogs(['ViewPropTypes']);
 
 LogBox.ignoreAllLogs();
 
@@ -86,6 +86,7 @@ LogBox.ignoreAllLogs();
       getWeather()
       mostrado()
       onScanDevices()
+      manager.stopDeviceScan()
     }, [])
 
 
@@ -132,10 +133,12 @@ LogBox.ignoreAllLogs();
     }
 
     const compruebaNull = () => {
-    onRegionChange()
+      useEffect(()=>{
+        onRegionChange()
     if(ubication.latitude===null||ubication.longitude===null||ubication.speed===null){
       return origin
     } else return onRegionChange()
+      })
     }
 
     const dataWeather = () => {
@@ -170,20 +173,68 @@ LogBox.ignoreAllLogs();
       if (device){
         setDevice(device)
         console.log('Dispositivo --> ', device.id)
+        manager.stopDeviceScan()
+
 
       }
     })
+    console.log('Dispositivo --> ', device.id)
+
+    //.then(manager.connectToDevice(device.id))
     manager.stopDeviceScan()
 
     return true;
   }
 
+
+    //OBD2
+
+    const ELM = () => {
+
+      console.log('Aqui llego')
+      const obd2 = require('@furkanom/react-native-obd2');
+      obd2.ready();
+  
+  
+      const [dataCar, setDataCar] = useState({
+          tempOBD: '-',
+          velocidadOBD: '0km/h',
+          rpmOBD: '0RPM',
+          obd2Data: []
+      })
+      
+      const startLiveData = () =>{
+        obd2.setMockUpMode(true);
+        obd2.startLiveData('10 F0 8B 3F 91 DEL ELM CUANDO SE CONECTE')
+      }
+  
+  
+      const obd2LiveData = (data) => {
+        let copyData = JSON.parse(JSON.stringify(setDataCar.obd2Data))
+        copyData[data.cmdID] = data;
+        setDataCar(copyData)
+  
+  
+        if (data.cmdID  === 'ENGINE_RPM'){
+          setDataCar.rpmOBD = data.cmdResult
+        }
+  
+        if (data.cmdID  === 'SPEED'){
+          setDataCar.velocidadOBD = data.cmdResult
+        }
+  
+        if (data.cmdID  === 'AIR_INTAKE_TEMP'){
+          setDataCar.tempOBD = data.cmdResult
+        }
+  
+      }
+  
   
 
 
  
 
-    
+    }
     return( 
 
     <View style={styles.fondo}>
