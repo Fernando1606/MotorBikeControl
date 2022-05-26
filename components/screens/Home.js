@@ -72,6 +72,12 @@ LogBox.ignoreAllLogs();
       speed: 0
     })
 
+    const [dataCar, setDataCar] = useState({
+      tempOBD: '-',
+      velocidadOBD: '0km/h',
+      rpmOBD: '0RPM',
+      obd2Data: []
+  })
 
     const [ubication,setUbication] = useState({
       latitude: origin.latitude,
@@ -85,8 +91,8 @@ LogBox.ignoreAllLogs();
       getLocation()
       getWeather()
       mostrado()
-      onScanDevices()
-      manager.stopDeviceScan()
+
+      ELM()
     }, [])
 
 
@@ -195,13 +201,6 @@ LogBox.ignoreAllLogs();
       const obd2 = require('@furkanom/react-native-obd2');
       obd2.ready();
   
-  
-      const [dataCar, setDataCar] = useState({
-          tempOBD: '-',
-          velocidadOBD: '0km/h',
-          rpmOBD: '0RPM',
-          obd2Data: []
-      })
       
       const startLiveData = () =>{
         obd2.setMockUpMode(true);
@@ -226,16 +225,15 @@ LogBox.ignoreAllLogs();
         if (data.cmdID  === 'AIR_INTAKE_TEMP'){
           setDataCar.tempOBD = data.cmdResult
         }
-  
       }
-  
-  
 
 
  
 
     }
     return( 
+
+      console.log(dataCar),
 
     <View style={styles.fondo}>
         {/*Textos superiores*/}
