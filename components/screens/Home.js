@@ -1,14 +1,16 @@
 import {styles} from '../styles';
 import ForecastCard from '../ForecastCard';
 import { View, Text, Image, FlatList, DeviceEventEmitter, PermissionsAndroid} from 'react-native';
-import React, { useRef } from 'react';
+import React  from 'react';
 import Speedometer, { Background, Arc, Needle, Progress, Marks, Indicator, DangerPath } from 'react-native-cool-speedometer';
 import MapView, {Marker, PROVIDER_GOOGLE}  from 'react-native-maps';
 import RNLocation from "react-native-location";
 import {useState, useEffect} from 'react';
-import { BleManager } from 'react-native-ble-plx';
 import { LogBox } from 'react-native';
-import obd2, { startLiveData } from '@furkanom/react-native-obd2';
+import OBDReader from '../OBDReader';
+
+
+
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
@@ -41,30 +43,6 @@ LogBox.ignoreAllLogs();
       }
     }
 
-    const requestBluetoothPermission = async () => {
-      try{
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-
-          {
-            title: 'Permisos de Bluetooth',
-            message: 'Necesitamos acceder a tu bluetooth',
-            buttonPositive: 'Ok',
-            buttonNegative: 'Cancelar'
-          }
-        );
-        if (granted===PermissionsAndroid.RESULTS.GRANTED){
-          console.log('Tenemos permisos de bluetooth')
-        }else{
-          console.log('Puta mierda')
-        }
-      } catch (err){
-         console.warn(err)
-      }
-    }
-
-
-
     const [weather, setWeather] = useState(null);
     const [origin] = useState({
       latitude: 37.3826,
@@ -72,13 +50,7 @@ LogBox.ignoreAllLogs();
       speed: 0
     })
 
-    const [dataCar, setDataCar] = useState({
-      tempOBD: '-',
-      velocidadOBD: '0km/h',
-      rpmOBD: '0RPM',
-      obd2Data: []
-  })
-
+    
     const [ubication,setUbication] = useState({
       latitude: origin.latitude,
       longitude: origin.longitude
@@ -87,12 +59,10 @@ LogBox.ignoreAllLogs();
 
     useEffect(() => {
       requestUbicationPermission()
-      requestBluetoothPermission()
       getLocation()
       getWeather()
       mostrado()
 
-      ELM()
     }, [])
 
 
@@ -135,6 +105,10 @@ LogBox.ignoreAllLogs();
 
     const mostrado = () => {
     setInterval(()=> {
+
+      console.log('Velocidad: ' , instancia.actualizacionDatos().velocidadOBD);
+      console.log('RPM: ' , instancia.actualizacionDatos().rpmOBD)
+
     },1000)
     }
 
@@ -152,88 +126,12 @@ LogBox.ignoreAllLogs();
     }
 
 
+    const instancia = new OBDReader();
+    
     
 
-
-  //Conexion bluetooth
-
-
-
-  const manager = new BleManager();
-  const [device, setDevice] = useState(null);
-
-
-  const onScanDevices = async() => {
-    const btState = await manager.state();
-    if (btState!=='PoweredOn'){
-      console.log('Fallo')
-      return false;
-    }
-
-    manager.startDeviceScan(null,null, async (error,device) =>{
-      if (error){
-        console.log('Error --> ', error)
-        return;
-      }
-
-      if (device){
-        setDevice(device)
-        console.log('Dispositivo --> ', device.id)
-        manager.stopDeviceScan()
-
-
-      }
-    })
-    console.log('Dispositivo --> ', device.id)
-
-    //.then(manager.connectToDevice(device.id))
-    manager.stopDeviceScan()
-
-    return true;
-  }
-
-
-    //OBD2
-
-    const ELM = () => {
-
-      console.log('Aqui llego')
-      const obd2 = require('@furkanom/react-native-obd2');
-      obd2.ready();
-  
-      
-      const startLiveData = () =>{
-        obd2.setMockUpMode(true);
-        obd2.startLiveData('10 F0 8B 3F 91 DEL ELM CUANDO SE CONECTE')
-      }
-  
-  
-      const obd2LiveData = (data) => {
-        let copyData = JSON.parse(JSON.stringify(setDataCar.obd2Data))
-        copyData[data.cmdID] = data;
-        setDataCar(copyData)
-  
-  
-        if (data.cmdID  === 'ENGINE_RPM'){
-          setDataCar.rpmOBD = data.cmdResult
-        }
-  
-        if (data.cmdID  === 'SPEED'){
-          setDataCar.velocidadOBD = data.cmdResult
-        }
-  
-        if (data.cmdID  === 'AIR_INTAKE_TEMP'){
-          setDataCar.tempOBD = data.cmdResult
-        }
-      }
-
-
- 
-
-    }
     return( 
-
-      console.log(dataCar),
+      
 
     <View style={styles.fondo}>
         {/*Textos superiores*/}
