@@ -37,6 +37,8 @@ export default class OBDReader extends React.Component {
         this.state = {
           speed: '0km/h',
           rpm: '0RPM',
+          engine_temp: 0,
+          fuel_press:0,
           engineRunTime: '00:00:00',
           isStartLiveData: false,
           gpsState: '-',
@@ -103,6 +105,18 @@ export default class OBDReader extends React.Component {
         if (data.cmdID === 'SPEED')
         {
             stateUpdateObj['speed'] = data.cmdResult;
+            haveData = true;
+        }
+
+        if (data.cmdID === 'ENGINE_OIL_TEMP')
+        {
+            stateUpdateObj['engine_temp'] = data.cmdResult;
+            haveData = true;
+        }
+
+        if (data.cmdID === 'FUEL_PRESSURE')
+        {
+            stateUpdateObj['fuel_press'] = data.cmdResult;
             haveData = true;
         }
         
@@ -215,7 +229,9 @@ export default class OBDReader extends React.Component {
     actualizacionDatos(){
         const datosOBD = {
             velocidadOBD: this.state.speed,
-            rpmOBD: this.state.rpm
+            rpmOBD: this.state.rpm,
+            tempOBD: this.state.engine_temp,
+            presOBD: this.state.fuel_press
         }
         return datosOBD
     }

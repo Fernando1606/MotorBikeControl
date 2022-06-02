@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
       marginTop: 15,
       fontSize: 25,
       flexDirection: 'row',
-      marginLeft: 35,
+      marginLeft: 50,
       fontFamily: 'Orbitron-Bold'
     },
     textoRPM:{
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
       marginTop: 15,
       fontSize: 25,
       flexDirection: 'row',
-      marginLeft: 185,
+      marginLeft: 225,
       fontFamily: 'Orbitron-Bold'
     },
     imagenesSuperiores: {
